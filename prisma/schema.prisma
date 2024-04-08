@@ -18,10 +18,10 @@ datasource db {
 model Ingredient {
   id         Int        @id @default(autoincrement())
   title  String
-  protein  Int
-  fat  Int
-  carbohydrate  Int
-  calorific_value  Int
+  protein  Float
+  fat  Float
+  carbohydrate  Float
+  calorific_value  Float
   recipes Recipe[]
 }
 
