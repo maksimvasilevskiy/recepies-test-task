@@ -11,18 +11,6 @@ export default async function Home() {
     }
   };
 
-  async function deleteRecipe(currentId: number) {
-    try {
-      await prisma.recipe.delete({
-        where: {
-          id: currentId,
-        },
-      });
-    } catch(error) {
-      console.log(error);
-    }
-  };
-
   const recipes = await getAllrecipes();
 
   return (
