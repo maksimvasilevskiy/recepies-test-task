@@ -1,4 +1,3 @@
-import Image from "next/image";
 import prisma from "../../prisma/prismaClient";
 import RecipesList from "@/components/recipesList/RecipesList";
 
@@ -7,6 +6,18 @@ export default async function Home() {
     try {
       const recipes = await prisma.recipe.findMany();
       return recipes;
+    } catch(error) {
+      console.log(error);
+    }
+  };
+
+  async function deleteRecipe(currentId: number) {
+    try {
+      await prisma.recipe.delete({
+        where: {
+          id: currentId,
+        },
+      });
     } catch(error) {
       console.log(error);
     }
