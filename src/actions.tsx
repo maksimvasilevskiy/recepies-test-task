@@ -11,4 +11,8 @@ export async function deleteRecipe(id: number) {
   } catch(error) {
     console.log(error);
   }
+};
+
+export async function addRecipe(id: number) {
+  console.log("id: " + id);
 }

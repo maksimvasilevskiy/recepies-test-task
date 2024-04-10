@@ -1,5 +1,6 @@
 import prisma from "../../prisma/prismaClient";
-import RecipesList from "@/components/recipesList/RecipesList";
+import RecipesList from "@/components/RecipesList";
+import AddRecipeButton from "./AddRecipeButton";
 
 export default async function Home() {
   async function getAllrecipes() {
@@ -14,8 +15,9 @@ export default async function Home() {
   const recipes = await getAllrecipes();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
+    <main className="flex min-h-screen flex-col items-center p-24">
+      <AddRecipeButton />
+      <div className="z-10 max-w-5xl w-full items-center justify-between text-sm lg:flex mt-[64px]">
         {recipes && <RecipesList recipes={recipes} />}
       </div>
     </main>
