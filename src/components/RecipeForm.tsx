@@ -1,22 +1,23 @@
 "use client";
-import { Fragment, useEffect } from "react";
+import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { HookFormInput as Input } from "./HookFormInput";
 import NextImage from "next/image";
 import close_icon from "../../public/icons/close.svg";
 import useZodForm from "../hooks/useZodForm";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { Controller } from "react-hook-form";
 import EditorButton from "./EditorButton";
+import { MuiChipsInput } from "mui-chips-input";
+import { addRecipe } from "@/actions";
 
 export const schema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, "Recipe title is required"),
   url: z.string().min(1, "Image url is required"),
   description: z.string().min(1, "Description is required"),
+  instructions: z.string().array(),
 });
 
 interface Props {
@@ -41,18 +42,23 @@ const RecipeForm: React.FC<Props> = ({
     schema,
     mode: "onBlur",
   });
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   const onSubmit = handleSubmit(async (formData) => {
-    console.log("Form data submitted:", formData);
-
-    console.log("selectedImage");
-    console.log(selectedImage);
+    try {
+      const result = await addRecipe({
+        name: formData.title,
+        description: formData.description,
+        imageUrl: formData.url,
+        instructions: formData.instructions,
+      });
+      console.log(result);
+    } catch (e) {
+      console.log(e);
+    }
     reset();
     router.refresh();
     onSuccess && onSuccess();
     handleClose();
-    console.log("Image details successfully saved.");
   });
 
   return (
@@ -84,7 +90,7 @@ const RecipeForm: React.FC<Props> = ({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="w-2/4 overflow-hidden rounded-xl  bg-white p-[40px] text-left shadow-xl">
+            <Dialog.Panel className="w-2/4 h-[90%] overflow-y-auto rounded-xl  bg-white p-[40px] text-left shadow-xl">
               <div className="flex flex-col bg-white pb-[40px]">
                 <div className="flex w-[99%] justify-between">
                   <Dialog.Title className="text-2xl font-bold">
@@ -132,6 +138,33 @@ const RecipeForm: React.FC<Props> = ({
                         isTextArea={true}
                       />
                     </div>
+                    <div className="flex flex-col gap-2">
+                      <label>Instructions</label>
+                      <Controller
+                        control={control}
+                        name="instructions"
+                        render={({ field }) => (
+                          <MuiChipsInput
+                            className="[&>div]:flex [&>div]:flex-col [&>div]:justify-start [&>div>input]:mr-auto [&>div>fieldset]:border-hidden"
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        )}
+                      />
+                    </div>
+                    <div className="flex justify-end gap-4 pb-[40px]">
+                      <EditorButton
+                        className="bg-sea-green text-white disabled:border-none disabled:bg-ebony disabled:bg-opacity-20 disabled:text-ebony disabled:text-opacity-20"
+                        label={
+                          isSubmitting
+                            ? "Please wait"
+                            : "Add Recipe"
+                        }
+                        type="button"
+                        disabled={isSubmitting}
+                        onClick={onSubmit}
+                      />
+                    </div>
                   </div>
                 </form>
               ) : (
@@ -139,19 +172,6 @@ const RecipeForm: React.FC<Props> = ({
                   loading
                 </div>
               )}
-              <div className="flex justify-end gap-4">
-                <EditorButton
-                  className="bg-sea-green text-white disabled:border-none disabled:bg-ebony disabled:bg-opacity-20 disabled:text-ebony disabled:text-opacity-20"
-                  label={
-                    isSubmitting
-                      ? "Please wait"
-                      : "Add Recipe"
-                  }
-                  type="button"
-                  disabled={isSubmitting}
-                  onClick={onSubmit}
-                />
-              </div>
             </Dialog.Panel>
           </Transition.Child>
         </div>

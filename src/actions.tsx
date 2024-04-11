@@ -13,6 +13,21 @@ export async function deleteRecipe(id: number) {
   }
 };
 
-export async function addRecipe(id: number) {
-  console.log("id: " + id);
+export async function addRecipe(data: {
+  id?: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  instructions: string[];
+}) {
+  if (!data.id) {
+    return prisma.recipe.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        imageUrl: data.imageUrl,
+        instructions: data.instructions,
+      },
+    });
+  }
 }
