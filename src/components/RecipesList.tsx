@@ -1,7 +1,7 @@
 "use client"
 import Image from "next/image";
 import { type Prisma } from "@prisma/client";
-import { deleteRecipe } from "@/actions";
+import { deleteRecipe } from "../actions";
 import { useRouter } from "next/navigation";
 import EditRecipeButton from "./EditRecipeButton";
 

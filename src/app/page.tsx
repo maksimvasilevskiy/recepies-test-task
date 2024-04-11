@@ -1,5 +1,5 @@
 import prisma from "../../prisma/prismaClient";
-import RecipesList from "@/components/RecipesList";
+import RecipesList from "../components/RecipesList";
 import AddRecipeButton from "./AddRecipeButton";
 
 export default async function Home() {

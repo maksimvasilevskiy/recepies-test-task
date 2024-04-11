@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { Controller } from "react-hook-form";
 import EditorButton from "./EditorButton";
 import { MuiChipsInput } from "mui-chips-input";
-import { upsertRecipe } from "@/actions";
+import { upsertRecipe } from "../actions";
 
 export const schema = z.object({
   id: z.number().optional(),

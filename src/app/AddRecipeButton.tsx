@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import RecipeForm from "@/components/RecipeForm";
+import RecipeForm from "../components/RecipeForm";
 
 export default function AddRecipeButton() {
   const [isOpen, setIsOpen] = useState(false);
