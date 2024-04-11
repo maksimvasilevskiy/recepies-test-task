@@ -10,12 +10,12 @@ import { useRouter } from "next/navigation";
 import { Controller } from "react-hook-form";
 import EditorButton from "./EditorButton";
 import { MuiChipsInput } from "mui-chips-input";
-import { addRecipe } from "@/actions";
+import { upsertRecipe } from "@/actions";
 
 export const schema = z.object({
-  id: z.string().optional(),
-  title: z.string().min(1, "Recipe title is required"),
-  url: z.string().min(1, "Image url is required"),
+  id: z.number().optional(),
+  name: z.string().min(1, "Recipe title is required"),
+  imageUrl: z.string().min(1, "Image url is required"),
   description: z.string().min(1, "Description is required"),
   instructions: z.string().array(),
 });
@@ -24,12 +24,20 @@ interface Props {
   onSuccess?: () => void;
   isOpen: boolean;
   handleClose: () => void;
+  defaultValues?: {
+    id?: number,
+    name: string,
+    imageUrl: string,
+    description: string,
+    instructions: string[],
+  }
 }
 
 const RecipeForm: React.FC<Props> = ({
   onSuccess,
   isOpen,
   handleClose,
+  defaultValues,
 }) => {
   const router = useRouter();
   const {
@@ -41,15 +49,18 @@ const RecipeForm: React.FC<Props> = ({
   } = useZodForm({
     schema,
     mode: "onBlur",
+    defaultValues: defaultValues || {
+      name: "",
+      imageUrl: "",
+      description: "",
+      instructions: [],
+    },
   });
 
   const onSubmit = handleSubmit(async (formData) => {
     try {
-      const result = await addRecipe({
-        name: formData.title,
-        description: formData.description,
-        imageUrl: formData.url,
-        instructions: formData.instructions,
+      const result = await upsertRecipe({
+        ...formData
       });
       console.log(result);
     } catch (e) {
@@ -112,7 +123,7 @@ const RecipeForm: React.FC<Props> = ({
                       <Input
                         className="w-full"
                         placeholder="Recipe title"
-                        name="title"
+                        name="name"
                         register={register}
                         errors={errors}
                       />
@@ -122,7 +133,7 @@ const RecipeForm: React.FC<Props> = ({
                       <Input
                         className="w-full"
                         placeholder="Image url"
-                        name="url"
+                        name="imageUrl"
                         register={register}
                         errors={errors}
                       />
@@ -158,7 +169,9 @@ const RecipeForm: React.FC<Props> = ({
                         label={
                           isSubmitting
                             ? "Please wait"
-                            : "Add Recipe"
+                            : defaultValues?.id
+                              ? "Save recipe"
+                              : "Add recipe"
                         }
                         type="button"
                         disabled={isSubmitting}

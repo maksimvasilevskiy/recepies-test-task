@@ -13,8 +13,8 @@ export async function deleteRecipe(id: number) {
   }
 };
 
-export async function addRecipe(data: {
-  id?: string;
+export async function upsertRecipe(data: {
+  id?: number;
   name: string;
   description: string;
   imageUrl: string;
@@ -22,6 +22,15 @@ export async function addRecipe(data: {
 }) {
   if (!data.id) {
     return prisma.recipe.create({
+      data: {
+        ...data
+      },
+    });
+  } else {
+    return prisma.recipe.update({
+      where: {
+        id: data.id,
+      },
       data: {
         name: data.name,
         description: data.description,
