@@ -24,7 +24,7 @@ const RecipesList: React.FC<RecipesListProps> = ({
                 <li
                     key={recipe.id}
                     className={
-                        `items-center rounded-[25px] border-[1px] border-solid border-white p-[24px] 
+                        `h-[200px] items-center rounded-[25px] border-[1px] border-solid border-white p-[24px] 
                         flex justify-start bg-[#ffffff7e] ${i > 0 ? "mt-[24px]" : ""}`
                     }
                 >
