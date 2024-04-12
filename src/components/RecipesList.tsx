@@ -17,8 +17,9 @@ const RecipesList: React.FC<RecipesListProps> = ({
         await deleteRecipe(id);
         router.refresh();
     }
+    console.log(recipes);
     return (
-        <ul>
+        <ul className="w-full">
             {recipes.map((recipe, i) => 
                 <li
                     key={recipe.id}
@@ -27,7 +28,7 @@ const RecipesList: React.FC<RecipesListProps> = ({
                         flex justify-start bg-[#ffffff7e] ${i > 0 ? "mt-[24px]" : ""}`
                     }
                 >
-                    <Image className="rounded-[10px] shrink-0" alt="recipe-image" width={150} height={150} src={recipe.imageUrl} />
+                    <Image className="rounded-[10px] shrink-0 max-h-[150px]" alt="recipe-image" height={150} width={150} src={recipe.imageUrl} />
                     <div className="ml-[24px]">
                         <div className="font-bold text-[24px]">{recipe.name}</div>
                         <div className="text-[18px] mt-[12px] leading-6">{recipe.description}</div>

@@ -1,5 +1,14 @@
 "use server";
 import prisma from "../prisma/prismaClient";
+import type { Ingredient } from "@prisma/client";
+
+export async function getIngredients() {
+  try {
+    return await prisma.ingredient.findMany();
+  } catch(error) {
+    console.log(error);
+  }
+};
 
 export async function deleteRecipe(id: number) {
   try {
@@ -13,17 +22,35 @@ export async function deleteRecipe(id: number) {
   }
 };
 
-export async function upsertRecipe(data: {
-  id?: number;
-  name: string;
-  description: string;
-  imageUrl: string;
-  instructions: string[];
+export async function upsertRecipe({
+  data,
+  selectedIngredients
+}: {
+  data: {
+    id?: number;
+    name: string;
+    description: string;
+    imageUrl: string;
+    instructions: string[];
+  },
+  selectedIngredients: {
+    ingredientId: number;
+    amount: number;
+  }[],
 }) {
+  console.log(selectedIngredients);
   if (!data.id) {
     return prisma.recipe.create({
       data: {
-        ...data
+        ...data,
+        ingredientsAmount: {
+          create: selectedIngredients.map((ingredient) => {
+            return {
+              ingredientId: ingredient.ingredientId,
+              amount: ingredient.amount,
+            };
+          }),
+        }
       },
     });
   } else {

@@ -1,5 +1,5 @@
 "use client";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { HookFormInput as Input } from "./HookFormInput";
 import NextImage from "next/image";
@@ -10,7 +10,8 @@ import { useRouter } from "next/navigation";
 import { Controller } from "react-hook-form";
 import EditorButton from "./EditorButton";
 import { MuiChipsInput } from "mui-chips-input";
-import { upsertRecipe } from "../actions";
+import { upsertRecipe, getIngredients } from "../actions";
+import type { Ingredient } from "@prisma/client";
 
 export const schema = z.object({
   id: z.number().optional(),
@@ -30,6 +31,11 @@ interface Props {
     imageUrl: string,
     description: string,
     instructions: string[],
+    ingredientsAmount: {
+      id: number,
+      ingredientId: number,
+      amount: number,
+    }[],
   }
 }
 
@@ -39,6 +45,13 @@ const RecipeForm: React.FC<Props> = ({
   handleClose,
   defaultValues,
 }) => {
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [selectedIngredients, setSelectedIngredients] = useState<{
+    ingredientId: number;
+    amount: number;
+  }[]>(defaultValues?.ingredientsAmount.length ? defaultValues.ingredientsAmount : []);
+  const [currentIngredient, setCurrentIngredient] = useState<Ingredient | null>(null);
+  const [ingredientAmount, setIngredientAmount] = useState<number>(0);
   const router = useRouter();
   const {
     control,
@@ -54,13 +67,28 @@ const RecipeForm: React.FC<Props> = ({
       imageUrl: "",
       description: "",
       instructions: [],
+      ingredientsAmount: [],
     },
   });
+
+  useEffect(() => {
+    const getData = async () => {
+      const ingredients = await getIngredients();
+      if (ingredients) {
+        setIngredients(ingredients);
+        setCurrentIngredient(ingredients[0]);
+      }
+    }
+    getData();
+  }, []);
 
   const onSubmit = handleSubmit(async (formData) => {
     try {
       const result = await upsertRecipe({
-        ...formData
+        data: {
+          ...formData,
+        },
+        selectedIngredients,
       });
       console.log(result);
     } catch (e) {
@@ -71,6 +99,36 @@ const RecipeForm: React.FC<Props> = ({
     onSuccess && onSuccess();
     handleClose();
   });
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.currentTarget.selectedOptions[0].id;
+    const currentIngredient = ingredients.find((elem) => elem.id === Number(selectedId));
+    if (currentIngredient) {
+      setCurrentIngredient(currentIngredient);
+    }
+  };
+
+  const handleAddIngredient = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    if (currentIngredient && ingredientAmount > 0) {
+      if (selectedIngredients.find((elem) => currentIngredient.id === elem.ingredientId)) {
+        return;
+      }
+      setSelectedIngredients([
+        ...selectedIngredients,
+        {
+          ingredientId: currentIngredient.id,
+          amount: ingredientAmount,
+        }
+      ]);
+      setCurrentIngredient(ingredients[0]);
+      setIngredientAmount(0);
+    }
+  };
+
+  const handleDeleteIngredient = (id: number) => {
+    setSelectedIngredients(selectedIngredients.filter((ingredient) => ingredient.ingredientId !== id));
+  }
 
   return (
     <Transition show={isOpen} as={Fragment}>
@@ -105,7 +163,9 @@ const RecipeForm: React.FC<Props> = ({
               <div className="flex flex-col bg-white pb-[40px]">
                 <div className="flex w-[99%] justify-between">
                   <Dialog.Title className="text-2xl font-bold">
-                    Add Recipe
+                    {defaultValues?.id
+                      ? "Edit recipe"
+                      : "Add recipe"}
                   </Dialog.Title>
                   <button onClick={handleClose} className="focus:outline-none">
                     <NextImage alt="plus" src={close_icon} />
@@ -119,7 +179,7 @@ const RecipeForm: React.FC<Props> = ({
                 >
                   <div className="col-span-2 flex w-full flex-col gap-[34px]">
                     <div className="flex flex-col gap-2">
-                      <label>Recipe title</label>
+                      <label className="text-[20px] font-bold">Recipe title</label>
                       <Input
                         className="w-full"
                         placeholder="Recipe title"
@@ -129,7 +189,7 @@ const RecipeForm: React.FC<Props> = ({
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label>Recipe image url</label>
+                      <label className="text-[20px] font-bold">Recipe image url</label>
                       <Input
                         className="w-full"
                         placeholder="Image url"
@@ -139,7 +199,7 @@ const RecipeForm: React.FC<Props> = ({
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label>Recipe description</label>
+                      <label className="text-[20px] font-bold">Recipe description</label>
                       <Input
                         className="w-full"
                         placeholder="Recipe description"
@@ -150,7 +210,7 @@ const RecipeForm: React.FC<Props> = ({
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label>Instructions</label>
+                      <label className="text-[20px] font-bold">Instructions</label>
                       <Controller
                         control={control}
                         name="instructions"
@@ -162,6 +222,60 @@ const RecipeForm: React.FC<Props> = ({
                           />
                         )}
                       />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[20px] font-bold">Ingredinets</label>
+                      {selectedIngredients.map((obj) => {
+                        return <div key={obj.ingredientId} className="flex items-center">
+                          <span>
+                            {`${ingredients.find((elem) => elem.id === obj.ingredientId)?.title}: ${obj.amount} grams`}
+                          </span>
+                          <button
+                            onClick={() => handleDeleteIngredient(obj.ingredientId)}
+                            className="focus:outline-none ml-4"
+                          >
+                            <NextImage alt="plus" src={close_icon} />
+                          </button>
+                        </div>;
+                      })}
+                      <div className="flex items-end border-t-[1px] border-solid border-black w-max pt-3">
+                        <div className="mr-4 flex flex-col">
+                          <label>Ingredient</label>
+                          <select
+                            className={`
+                            [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none 
+                            [&::-webkit-inner-spin-button]:appearance-none rounded-xl border border-ebony 
+                            border-opacity-60 w-[128px] py-[13px] pl-[17px] focus:outline-none h-[52px] mt-3
+                            `}
+                            onChange={(e) => handleSelectChange(e)}
+                          >
+                            {ingredients.map((ingredient, i) => (
+                              <option key={ingredient.title} id={String(ingredient.id)}>
+                                {ingredient.title}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="mr-4 flex flex-col">
+                          <label>Amount in grams</label>
+                          <input
+                            type="number"
+                            className={`
+                              [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none 
+                              [&::-webkit-inner-spin-button]:appearance-none w-[128px] rounded-xl border 
+                              border-ebony border-opacity-60 py-[13px] pl-[17px] focus:outline-none mt-3
+                            `}
+                            value={ingredientAmount}
+                            onChange={(e) => setIngredientAmount(Number(e.currentTarget.value))}
+                          ></input>
+                        </div>
+                        <button
+                          className="h-[45px] flex bg-[#ffffff7e] items-center justify-center gap-[13px] rounded-3xl border-2 border-black fill-rose px-[18px] py-[10px] text-[15px] text-black hover:border-[#009900]  hover:text-[#009900] disabled:border-[#10182066] disabled:text-[#10182066] xl:px-[22px] xl:text-l"
+                          onClick={(e) => handleAddIngredient(e)}
+                        >
+                          Add ingredient
+                        </button>
+                      </div>
                     </div>
                     <div className="flex justify-end gap-4 pb-[40px]">
                       <EditorButton

@@ -14,7 +14,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-
 model Ingredient {
   id         Int        @id @default(autoincrement())
   title  String
@@ -22,7 +21,15 @@ model Ingredient {
   fat  Float
   carbohydrate  Float
   calorific_value  Float
+  ingredientsAmount IngredientAmount[]
+}
+
+model IngredientAmount {
+  id         Int        @id @default(autoincrement())
+  ingredientId Int
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
   recipes Recipe[]
+  amount Float
 }
 
 model Recipe {
@@ -30,6 +37,6 @@ model Recipe {
   name  String
   imageUrl  String
   description  String
-  ingredients Ingredient[]
   instructions String[]
+  ingredientsAmount IngredientAmount[]
 }
