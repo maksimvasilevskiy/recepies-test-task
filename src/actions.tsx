@@ -38,7 +38,6 @@ export async function upsertRecipe({
     amount: number;
   }[],
 }) {
-  console.log(selectedIngredients);
   if (!data.id) {
     return prisma.recipe.create({
       data: {

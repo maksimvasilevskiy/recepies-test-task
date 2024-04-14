@@ -37,8 +37,6 @@ const SignIn = () => {
       createUserWithEmailAndPassword(auth, formData.email, formData.password)
       .then(() => {
         signInWithEmailAndPassword(auth, formData.email, formData.password).then(() => {
-          console.log("auth.currentUser");
-          console.log(auth.currentUser);
           router.push("/");
         });
       })

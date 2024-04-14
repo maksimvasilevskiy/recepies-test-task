@@ -33,8 +33,6 @@ const SignIn = () => {
   const onSubmit = handleSubmit((formData) => {
     setError(null);
     signInWithEmailAndPassword(auth, formData.email, formData.password).then(() => {
-      console.log("auth.currentUser");
-      console.log(auth.currentUser);
       router.push("/");
     })
     .catch(error => {

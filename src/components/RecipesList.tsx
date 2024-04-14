@@ -17,7 +17,6 @@ const RecipesList: React.FC<RecipesListProps> = ({
         await deleteRecipe(id);
         router.refresh();
     }
-    console.log(recipes);
     return (
         <ul className="w-full">
             {recipes.map((recipe, i) => 
@@ -29,6 +28,10 @@ const RecipesList: React.FC<RecipesListProps> = ({
                     }
                 >
                     <Image className="rounded-[10px] shrink-0 max-h-[150px]" alt="recipe-image" height={150} width={150} src={recipe.imageUrl} />
+                    <div className="ml-[24px]">
+                        <div className="font-bold text-[24px]">{recipe.name}</div>
+                        <div className="text-[18px] mt-[12px] leading-6">{recipe.description}</div>
+                    </div>
                     <div className="ml-[24px]">
                         <div className="font-bold text-[24px]">{recipe.name}</div>
                         <div className="text-[18px] mt-[12px] leading-6">{recipe.description}</div>
