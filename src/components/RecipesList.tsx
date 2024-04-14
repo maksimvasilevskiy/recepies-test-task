@@ -32,10 +32,6 @@ const RecipesList: React.FC<RecipesListProps> = ({
                         <div className="font-bold text-[24px]">{recipe.name}</div>
                         <div className="text-[18px] mt-[12px] leading-6">{recipe.description}</div>
                     </div>
-                    <div className="ml-[24px]">
-                        <div className="font-bold text-[24px]">{recipe.name}</div>
-                        <div className="text-[18px] mt-[12px] leading-6">{recipe.description}</div>
-                    </div>
                     <div className="ml-auto pl-[24px] flex flex-col justify-center shrink-0">   
                         <EditRecipeButton recipe={recipe} />
                         <Image
