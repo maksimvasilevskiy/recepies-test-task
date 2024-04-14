@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 import EditRecipeButton from "./EditRecipeButton";
 
 interface RecipesListProps {
-    recipes: Prisma.RecipeGetPayload<{}>[];
+    recipes: Prisma.RecipeGetPayload<{
+        include: {
+            ingredientsAmount: true,
+        }
+    }>[];
 }
 
 const RecipesList: React.FC<RecipesListProps> = ({

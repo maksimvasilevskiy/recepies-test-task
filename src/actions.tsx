@@ -1,6 +1,5 @@
 "use server";
 import prisma from "../prisma/prismaClient";
-import type { Ingredient } from "@prisma/client";
 
 export async function getIngredients() {
   try {

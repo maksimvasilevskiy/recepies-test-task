@@ -1,11 +1,15 @@
 "use client"
 import React, { useState } from "react";
 import Image from "next/image";
-import type { Recipe } from "@prisma/client";
+import { type Prisma } from "@prisma/client";
 import RecipeForm from "./RecipeForm";
 
 type EditRecipeButtonProps = {
-  recipe: Recipe;
+  recipe: Prisma.RecipeGetPayload<{
+      include: {
+          ingredientsAmount: true,
+      }
+  }>;
 };
 
 const EditRecipeButton = ({
