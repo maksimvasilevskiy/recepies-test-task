@@ -53,13 +53,15 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
-      <div className="flex justify-between w-full items-center max-w-5xl">
-        <div>{ingredientsNames ? <IngredientsFilter ingredients={ingredientsNames} /> : ""}</div>
-        <AddRecipeButton />
-      </div>
-      <div className="z-10 max-w-5xl w-full items-center justify-between text-sm lg:flex mt-[64px]">
-        {filteredRecipes && <RecipesList recipes={filteredRecipes} />}
-      </div>
+      <>
+        <div className="flex justify-between w-full items-center max-w-5xl">
+          <div>{ingredientsNames ? <IngredientsFilter ingredients={ingredientsNames} /> : ""}</div>
+          <AddRecipeButton />
+        </div>
+        <div className="z-10 max-w-5xl w-full items-center justify-between text-sm lg:flex mt-[64px]">
+          {filteredRecipes && <RecipesList recipes={filteredRecipes} />}
+        </div>
+      </>
     </main>
   );
 }
