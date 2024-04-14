@@ -14,7 +14,7 @@ export const schema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-const SignIn = () => {
+export default function SignIn() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const {
@@ -92,5 +92,3 @@ const SignIn = () => {
     </div>
   )
 }
-
-export default SignIn;
