@@ -10,15 +10,15 @@ const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  /*onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, (user) => {
     if (user) {
       setCurrentUser(user);
     } else {
-      if (pathname === "/") {
+      /*if (pathname === "/") {
         router.push("/signin");
-      }
+      }*/
     }
-  });*/
+  });
 
   const handleSignOut = () => {
     signOut(auth).then(() => {
